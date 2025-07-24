@@ -1,5 +1,14 @@
 <?php
 require_once 'includes/db.php';
+
+$search = $_GET['search'] ?? '';
+
+if ($search) {
+    $stmt = $pdo->prepare("SELECT * FROM employes WHERE nom LIKE ? OR poste LIKE ?");
+    $stmt->execute(["%$search%", "%$search%"]);
+} else {
+    $stmt = $pdo->query("SELECT * FROM employes");
+}
 ?>
 
 <!DOCTYPE html>
@@ -11,6 +20,11 @@ require_once 'includes/db.php';
 <body>
     <h1>Liste des employés</h1>
     <a href="ajouter.php">Ajouter un employé</a>
+    <form method="get" action="">
+        <input type="text" name="search" placeholder="Rechercher un employé..." value="<?= htmlspecialchars($search) ?>">
+        <input type="submit" value="Rechercher">
+    </form>
+
     <table border="1">
         <tr>
             <th>Nom</th>
@@ -20,7 +34,6 @@ require_once 'includes/db.php';
             <th>Actions</th>
         </tr>
         <?php
-        $stmt = $pdo->query("SELECT * FROM employes");
         while ($row = $stmt->fetch()) {
             echo "<tr>
                     <td>{$row['nom']}</td>
